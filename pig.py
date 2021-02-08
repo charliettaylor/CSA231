@@ -1,43 +1,16 @@
 # The Game of Pig by Charlie Taylor
 
 import random as rand
-
-'''
-1. Double Sider - The pigs are both on their sides - 1 Point
-2. Double Razorback - The pigs are both lying on their backs - 20 Points
-3. Double Trotter - The pigs are both standing upright - 20 Points
-4. Double Snouter - The pigs are both leaning on their snouts - 40 Points
-5. Double Leaning Jowler - The pigs are both resting between snouts and ears - 60 Points
-6. Oinker - If both pigs are touching in any way, then the player's total score
- is reset to 0 and the turn changes to the next player.
-7. Piggyback - If one pig lands completely resting on top of the other, then the
- player is out of the game. (According to the scoring rules on the front of the
-  game package such a result is impossible, but it may very well happen in your game!
-   - and your weighted random must consider this unlikely outcome).
-8. Mixed Combo - A combination not mentioned above is the sum of the single pigs' scores.
- So if this outcome results from the roll, the following must be displayed
-  (e.g. Mixed Combo: Sider and Leaning Jowler).
-'''
-
-'''
-Your program should take the players' names and the target score as command line arguments, in that order.
-When one player earns at least the target score, the game ends and that player wins.
-The players should have the option to ROLL or PASS. Your program should be not be case sensitive; the user should be able to enter "ROLL" or "roll" or "Roll" or such thing.
-If the player rolls, your program should randomly generate the pigs' landing positions and print out the result of the roll and how many points the player earned for that roll.
-If the player rolls an Oinker, then the player loses ALL of his/her points, and play goes to the next player.
-If the player rolls a Piggyback, the game ends and the other player wins!
-Name your file pig.py
-'''
-
 # side 1, feet 2, back 3, snout 4, ears and nose 5, touching 6
 DICE_BIAS = (0.35, 0.3, 0.2, 0.1, 0.04, 0.01)
+
 
 def dice():
     '''
     rolls weighted 'dice' that represent each part of the pig and returns an
     integer
     '''
-    roll = rand.random() # in [0,1]
+    roll = rand.random()
     sum = 0
     result = 1
     for mass in DICE_BIAS:
@@ -73,15 +46,20 @@ def doubles(rolls: list):
             return -2
     return 0
 
-# side 1, feet 2, back 3, snout 4, ears and nose 5, piggyback 6
+
 def mixed_combo(score: int, rolls: list):
+    '''
+    matches roll to score and prints out a message based on that, returns score
+    to be added to total player score
+    '''
     scores = [0, 5, 5, 10, 15]
     messages = ['Sider', 'Trotter', 'Razorback', 'Snouter', 'Leaning Jowler']
     if rolls[0] == 6 or rolls[1] == 6:
         print("You rolled an Oinker!")
         return -1 * score
-    #scores[] is in order of what you can roll
-    print("Mixed Combo:", messages[rolls[0] - 1], "and", messages[rolls[1] - 1])
+    # scores[] is in order of what you can roll
+    print("Mixed Combo:", messages[rolls[0] - 1],
+          "and", messages[rolls[1] - 1])
     return (scores[rolls[0] - 1]) + (scores[rolls[1] - 1])
 
 
@@ -115,10 +93,9 @@ def game_loop(p1Name: str, p2Name: str, maxScore: int):
                 print(p1Name, "has won!")
                 p1Play = False
                 p2Play = False
-            
         elif p2Play:
             print('-' * 25)
-            user_input = input(p2Name +"'s turn, roll or pass? ")
+            user_input = input(p2Name + "'s turn, roll or pass? ")
             if user_input.lower() == 'roll':
                 add = take_turn(score2)
                 if add == -2:
@@ -145,9 +122,7 @@ def take_turn(score: int) -> int:
     '''
     turn = [dice(), dice()]
     doubleCheck = doubles(turn)
-    if doubleCheck != 0 and doubleCheck != -1:
-        return doubleCheck
-    elif doubleCheck == -1:
+    if doubleCheck != 0:
         return doubleCheck
     elif doubleCheck == 0:
         return mixed_combo(score, turn)
@@ -160,7 +135,7 @@ def main():
     while int(maxScore) <= 0:
         maxScore = int(input("Please enter a score greater than 0: "))
     game_loop(p1Name, p2Name, maxScore)
-  
+
 
 if __name__ == "__main__":
     main()
