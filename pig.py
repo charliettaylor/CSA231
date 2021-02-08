@@ -68,6 +68,7 @@ def mixed_combo(score: int, rolls: list) -> int:
     return (scores[rolls[0] - 1]) + (scores[rolls[1] - 1])
 assert mixed_combo(10, [1, 2]) == 5
 
+
 def game_loop(p1Name: str, p2Name: str, maxScore: int):
     '''
     main game loop that controls turns/score and asks for input from players
@@ -123,7 +124,7 @@ def game_loop(p1Name: str, p2Name: str, maxScore: int):
                 print(p2Name, 'has passed to', p1Name)
                 turn = 1 - turn
         if score1 >= maxScore or score2 >= maxScore:
-            
+
             print(p1Name if score1 >= maxScore else p2Name, "has won!")
             p1Play = False
             p2Play = False
