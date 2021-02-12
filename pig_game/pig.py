@@ -1,6 +1,7 @@
 # The Game of Pig by Charlie Taylor
 import sys
 import random as rand
+import playsound as ps
 # side 1, feet 2, back 3, snout 4, ears and nose 5, touching 6
 DICE_BIAS = (0.30, 0.25, 0.15, 0.1, 0.1, 0.1)
 
@@ -30,6 +31,7 @@ def doubles(rolls: list) -> int:
     assert rolls != 0
     assert len(rolls) == 2
     if rolls[0] == rolls[1]:
+        ps.playsound("Pig_idle2.mp3")
         if rolls[0] == 1:
             print("You rolled a Double Sider")
             return 1
@@ -47,9 +49,10 @@ def doubles(rolls: list) -> int:
             return 60
         elif rolls[0] == 6:
             print("You rolled a Piggyback")
+            ps.playsound("you-died.mp3")
             return -2
     return 0
-assert doubles([6, 6]) == -2
+# assert doubles([6, 6]) == -2
 
 
 def mixed_combo(score: int, rolls: list) -> int:
@@ -60,13 +63,15 @@ def mixed_combo(score: int, rolls: list) -> int:
     scores = [0, 5, 5, 10, 15]
     messages = ['Sider', 'Trotter', 'Razorback', 'Snouter', 'Leaning Jowler']
     if rolls[0] == 6 or rolls[1] == 6:
+        ps.playsound("Pig_death.mp3")
         print("You rolled an Oinker!")
         return -1 * score
     # scores[] is in order of what you can roll
+    ps.playsound("pigman.mp3")
     print("Mixed Combo:", messages[rolls[0] - 1],
           "and", messages[rolls[1] - 1])
     return (scores[rolls[0] - 1]) + (scores[rolls[1] - 1])
-assert mixed_combo(10, [1, 2]) == 5
+# assert mixed_combo(10, [1, 2]) == 5
 
 
 def game_loop(p1Name: str, p2Name: str, maxScore: int):
