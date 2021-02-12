@@ -3,6 +3,12 @@ import sys
 import random as rand
 import playsound as ps
 # side 1, feet 2, back 3, snout 4, ears and nose 5, touching 6
+
+'''
+Bonus feature:
+Added sound effects with the playsound library for each type of roll in the
+game
+'''
 DICE_BIAS = (0.30, 0.25, 0.15, 0.1, 0.1, 0.1)
 
 
@@ -66,7 +72,6 @@ def mixed_combo(score: int, rolls: list) -> int:
         ps.playsound("Pig_death.mp3")
         print("You rolled an Oinker!")
         return -1 * score
-    # scores[] is in order of what you can roll
     ps.playsound("pigman.mp3")
     print("Mixed Combo:", messages[rolls[0] - 1],
           "and", messages[rolls[1] - 1])
@@ -88,7 +93,6 @@ def game_loop(p1Name: str, p2Name: str, maxScore: int):
     p1Play = True
     p2Play = True
     user_input = ''
-    # 0 == false
     while p1Play or p2Play:
         if turn == 1 and p1Play:
             p1Play = True
