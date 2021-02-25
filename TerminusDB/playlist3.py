@@ -40,4 +40,5 @@ def main():
         insert(artist, length, album, title, count)
         count = count_objects()
 
-main()
+if __name__ == "__main__":
+    main()
