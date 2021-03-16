@@ -1,34 +1,34 @@
 # project2_sanitycheck.py
-# (Last Updated: 2021-02-13)
 #
+# A. Thornton
 #
 # This is a sanity checker for your Project #2 solution, which checks whether
 # your solution meets some basic requirements with respect to reading input
-# and formatting its output, as well as verifying that at least one example
-# can be run all the way to completion.
+# formatting its output:
 #
-# In order for the sanity check to run successfully, you'll need to meet
-# these requirements:
+# * The file is named correctly
+# * It's possible to run the program by executing the module
+# * Your program generates the correct output for one scenario (similar
+#   to the example shown in the project write-up)
 #
-# * This module is in the same directory as your Project #5 solution.
-# * This module's filename is exactly as it was on the course web site:
-#   "project2_sanitycheck.py".
-# * There is a module named "project2.py" in the same directory.
-# * It's possible to run the program by executing that "project2.py" module.
-# * Your program generates the correct output for one scenario, similar to
-#   the one shown in the project write-up.
+# Note that this project's output depends not only on its input, but also
+# on the presence of certain files that are being searched, so this sanity
+# checker will actually create a subdirectory within the directory where
+# this module is stored, then create some files with certain characteristics,
+# and finally will run your program and verify its output.
 #
 # If your program is unable to pass this sanity checker, it will certainly be
-# unable to pass all of our automated tests (and it may well fail all of them).
-# On the other hand, there are other tests you'll want to run besides the one
-# scenario here, because we'll be testing more than just one when we grade
-# your work.
+# unable to pass all of our automated tests.  On the other hand, there are
+# other tests you'll want to run besides the one scenario here, because we'll
+# be testing more than just one when we grade your work.
 #
-# YOU DO NOT NEED TO READ OR UNDERSTAND THIS CODE, though you can certainly
+# YOU DO NOT NEED TO READ OR UNDERSTAND THIS CODE, though can you certainly
 # feel free to take a look at it.
+
 
 import collections
 from collections.abc import Sequence
+import datetime
 import locale
 import pathlib
 import queue
@@ -181,7 +181,7 @@ class TestOutputLine:
         except Exception as e:
             print_labeled_output(
                 'EXCEPTION',
-                [tb_line.rstrip() for tb_line in traceback.format_exc().split('\n')])
+                *[tb_line.rstrip() for tb_line in traceback.format_exc().split('\n')])
 
             raise TestFailure()
 
@@ -216,6 +216,8 @@ class TestOutputLine:
                     'This line of output was required to have a newline',
                     'on the end of it, but it did not.')
 
+                raise TestFailure()
+
         else:
             print_labeled_output('EXPECTED', self._text)
 
@@ -248,19 +250,125 @@ class TestEndOfOutput:
 
 
 
+def write_test_file(dir_path: pathlib.Path, sub_path: pathlib.Path, lines: [str]) -> None:
+    path = dir_path / sub_path
+
+    if not path.parent.exists():
+        path.parent.mkdir(parents = True)
+
+    with path.open('w') as test_file:
+        for line in lines:
+            test_file.write(line + '\n')
+
+
+
+TEST_FILES = [
+    (pathlib.Path('test1.txt'), [
+        'This is a line of text',
+        'and this is another'
+    ]),
+    (pathlib.Path('test2.txt'), [
+        'There are a few lines of text',
+        'in this file',
+        'instead of just a couple',
+        'of them'
+    ]),
+    (pathlib.Path('Sub/meee.txt'), [
+        'I am Boo',
+        'and it is all about me',
+        'and everything is about me',
+        'so everyone should be focused on me'
+    ]),
+    (pathlib.Path('Sub/test1.txt'), [
+        'Hello, my name is Boo',
+        'How are you today?'
+    ]),
+    (pathlib.Path('Sub/youu.txt'), [
+        'Or maybe it should be about you',
+        'I cannot decide'
+    ]),
+    (pathlib.Path('Zzz/zzz.py'), [
+        'print(\'Sleep...\')',
+        'for i in range(10):',
+        '    print(\'ZZZZZZZZZZ\')'
+    ])
+]
+
+
+
+def create_test_directory() -> pathlib.Path:
+    now = datetime.datetime.now()
+
+    test_directory_name = 'project2_test_{:04}-{:02}-{:02}-{:02}-{:02}-{:02}'.format(
+        now.year, now.month, now.day, now.hour, now.minute, now.second)
+    
+    test_directory_path = pathlib.Path.cwd() / pathlib.Path(test_directory_name)
+    test_directory_path.mkdir(parents = True)
+
+    for sub_path, lines in TEST_FILES:
+        write_test_file(test_directory_path, sub_path, lines)
+
+    return test_directory_path
+
+
+
+def make_test_lines(test_directory_path: pathlib.Path) -> ['TestLine']:
+    test_lines = []
+
+    test_lines.append(TestInputLine(
+        'R {}'.format(str(test_directory_path))))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('test1.txt')), 10.0))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('test2.txt')), 10.0))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('Sub/meee.txt')), 10.0))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('Sub/test1.txt')), 10.0))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('Sub/youu.txt')), 10.0))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('Zzz/zzz.py')), 10.0))
+
+    test_lines.append(TestInputLine('N'))
+    test_lines.append(TestOutputLine('ERROR', 1.0))
+    test_lines.append(TestInputLine('N test1.txt'))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('test1.txt')), 10.0))
+
+    test_lines.append(TestOutputLine(
+        str(test_directory_path / pathlib.Path('Sub/test1.txt')), 10.0))
+
+    test_lines.append(TestInputLine('Q'))
+    test_lines.append(TestOutputLine('ERROR', 1.0))
+    test_lines.append(TestInputLine('F'))
+    test_lines.append(TestOutputLine('This is a line of text', 10.0))
+    test_lines.append(TestOutputLine('Hello, my name is Boo', 10.0))
+
+    return test_lines
+
+
+
 def run_test() -> None:
+    test_directory_path = create_test_directory()
     process = None
 
     try:
         process = start_process()
-        test_lines = make_test_lines()
+        test_lines = make_test_lines(test_directory_path)
         run_test_lines(process, test_lines)
-
         print_labeled_output(
             'PASSED',
-            'Your Project #4 implementation passed the sanity checker.  Note that',
-            'there are many other tests you\'ll want to run on your own, because',
-            'a number of other scenarios exist that are legal and interesting.')
+            'Your "project2.py" passed the sanity checker.  Note that there are',
+            'many other tests you\'ll want to run on your own, because there are',
+            'many different combinations of inputs that are legal.')
 
     except TestFailure:
         print_labeled_output(
@@ -274,20 +382,22 @@ def run_test() -> None:
 
 
 def start_process() -> TextProcess:
-    module_path = pathlib.Path.cwd() / 'project2.py'
+    filenames_in_dir = [p.name for p in list(pathlib.Path.cwd().iterdir()) if p.is_file()]
 
-    if not module_path.exists() or not module_path.is_file():
+    if not 'project2.py' in filenames_in_dir:
         print_labeled_output(
             'ERROR',
-            'Cannot find an executable "project2.py" file in this directory.',
+            'Cannot find file "project2.py" in this directory.',
             'Make sure that the sanity checker is in the same directory as the',
-            'files that comprise your Project #2 solution.')
+            '"project2.py" that comprises your Project #2 solution.  Also, be',
+            'sure that you\'ve named your "project2.py" file correctly, noting',
+            'that capitalization and spacing matter.')
 
         raise TestFailure()
 
     else:
         return TextProcess(
-            [sys.executable, str(module_path)],
+            [sys.executable, str(pathlib.Path.cwd() / 'project2.py')],
             str(pathlib.Path.cwd()))
 
 
@@ -304,54 +414,6 @@ def print_labeled_output(label: str, *msg_lines: Sequence[str]) -> None:
 
     if not showed_first:
         print(label)
-
-
-
-def make_test_lines() -> ['TestLine']:
-    test_lines = []
-
-    test_lines.append(TestInputLine('4'))
-    test_lines.append(TestInputLine('3'))
-    test_lines.append(TestInputLine('EMPTY'))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine(' --------- ', 10.0))
-    test_lines.append(TestInputLine('F 3 X Y Z'))
-    test_lines.append(TestOutputLine('|      [Z]|', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine(' --------- ', 10.0))
-    test_lines.append(TestInputLine(''))
-    test_lines.append(TestOutputLine('|      [Y]|', 10.0))
-    test_lines.append(TestOutputLine('|      [Z]|', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine(' --------- ', 10.0))
-    test_lines.append(TestInputLine(''))
-    test_lines.append(TestOutputLine('|      [X]|', 10.0))
-    test_lines.append(TestOutputLine('|      [Y]|', 10.0))
-    test_lines.append(TestOutputLine('|      [Z]|', 10.0))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine(' --------- ', 10.0))
-    test_lines.append(TestInputLine(''))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|      |X||', 10.0))
-    test_lines.append(TestOutputLine('|      |Y||', 10.0))
-    test_lines.append(TestOutputLine('|      |Z||', 10.0))
-    test_lines.append(TestOutputLine(' --------- ', 10.0))
-    test_lines.append(TestInputLine(''))
-    test_lines.append(TestOutputLine('|         |', 10.0))
-    test_lines.append(TestOutputLine('|       X |', 10.0))
-    test_lines.append(TestOutputLine('|       Y |', 10.0))
-    test_lines.append(TestOutputLine('|       Z |', 10.0))
-    test_lines.append(TestOutputLine(' --------- ', 10.0))
-    test_lines.append(TestInputLine('Q'))
-    test_lines.append(TestEndOfOutput(2.0))
-
-    return test_lines
 
 
 
