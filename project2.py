@@ -17,7 +17,7 @@ program ends
 '''
 
 from pathlib import Path
-import pprint as pp
+import shutil
 
 
 def get_file_path() -> list:
@@ -26,7 +26,7 @@ def get_file_path() -> list:
 
     while not directory.__contains__(' '):
         directory = input()
-    
+
     exists = Path(directory.split()[-1]).exists()
 
     while not start or not exists:
@@ -41,7 +41,7 @@ def get_file_path() -> list:
 def get_directory(dir: str):
     path = Path(dir[1])
 
-    if dir[0] ==  'D':
+    if dir[0] == 'D':
         path = sorted(path.glob('*/.'))
     elif dir[0] == 'R':
         path = sorted(path.glob('**/*'))
@@ -52,7 +52,7 @@ def get_directory(dir: str):
             files.append(file)
     return files
 
-   
+
 def mark_text_files(mark: list, subs: list) -> list:
     '''
     mark contains ['T', user text] where we want to mark files that contain
@@ -101,8 +101,8 @@ def get_mark() -> list:
     '''
     mark = input()
     start = mark.startswith('<') or mark.startswith('N')\
-         or mark.startswith('E') or mark.startswith('T')\
-         or mark.startswith('>')
+        or mark.startswith('E') or mark.startswith('T')\
+        or mark.startswith('>')
 
     while not start or not mark.__contains__(' ') or not len(mark.split()) == 2:
         if mark == 'A':
@@ -110,10 +110,11 @@ def get_mark() -> list:
         print('ERROR')
         mark = input()
         start = mark.startswith('<') or mark.startswith('N')\
-             or mark.startswith('E') or mark.startswith('T')\
-             or mark.startswith('>')
+            or mark.startswith('E') or mark.startswith('T')\
+            or mark.startswith('>')
 
     return mark.split()
+
 
 def mark_extensions(mark: list, subs: list):
     ext = mark[1]
@@ -130,15 +131,16 @@ def mark_all(mark: list,  subs: list):
 
 def mark_files(mark: list, subs: list):
     mark_options = {
-        'A' : mark_all,
-        'N' : mark_file_name,
-        'E' : mark_extensions,
-        'T' : mark_text_files,
-        '>' : mark_size_files,
-        '<' : mark_size_files
+        'A': mark_all,
+        'N': mark_file_name,
+        'E': mark_extensions,
+        'T': mark_text_files,
+        '>': mark_size_files,
+        '<': mark_size_files
     }
     mark_func = mark_options[mark[0]]
     return mark_func(mark, subs)
+
 
 def get_action() -> list:
     '''
@@ -146,21 +148,22 @@ def get_action() -> list:
     '''
     action = input()
     start = action.startswith('F') or action.startswith('D')\
-         or action.startswith('T')
+        or action.startswith('T')
 
     while not start and len(action) == 1:
         print('ERROR')
         action = input()
         start = action.startswith('F') or action.startswith('D')\
-             or action.startswith('T')
+            or action.startswith('T')
 
     return action
 
+
 def take_action(action: str, marked: list):
     actions = {
-        'F' : first_line,
-        'D' : dupe,
-        'T' : touch
+        'F': first_line,
+        'D': dupe,
+        'T': touch
     }
     action = actions[action]
     action(marked)
@@ -180,7 +183,10 @@ def first_line(marked: list):
 
 
 def dupe(marked: list):
-    pass
+    for file in marked:
+        name = file.stem
+        suffix = file.suffix
+        shutil.copy(str(file), str(file) + '.dup')
 
 
 def touch(marked: list):
@@ -188,21 +194,21 @@ def touch(marked: list):
         file.touch()
 
 
-def lexo_sort(x):
-    splits = x.__str__().split('\\')[4:]
-    return len(splits), splits
-
-
 def print_dir(dir: list):
     for file in sorted(dir, key=lexo_sort):
         print(file.__str__())
 
 
+def lexo_sort(x):
+    splits = x.__str__().split('\\')[4:]
+    return len(splits), splits
+
+
 def main():
-    dir = get_file_path() # gets user in for file path
-    dir = get_directory(dir) # returns either curr dir or all subs
+    dir = get_file_path()
+    dir = get_directory(dir)
     print_dir(dir)
-    mark = get_mark() # gets user in for what to mark
+    mark = get_mark()
     marked = mark_files(mark, dir)
     print_dir(marked)
     action = get_action()
