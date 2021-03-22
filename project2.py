@@ -21,6 +21,10 @@ import shutil
 
 
 def get_file_path() -> list:
+    '''
+    keeps asking user for file input until it receives correctly formatted
+    input
+    '''
     directory = input()
     start = directory.startswith('D') or directory.startswith('R')
 
@@ -38,7 +42,11 @@ def get_file_path() -> list:
     return directory.split()
 
 
-def get_directory(dir: str):
+def get_directory(dir: str) -> list:
+    '''
+    gets all files as specified by the first element in the list and returns
+    them as a list of paths
+    '''
     path = Path(dir[1])
 
     if dir[0] == 'D':
@@ -116,7 +124,11 @@ def get_mark() -> list:
     return mark.split()
 
 
-def mark_extensions(mark: list, subs: list):
+def mark_extensions(mark: list, subs: list) -> list:
+    '''
+    takes a list of Path objects and returns a list of Paths with matching
+    extension
+    '''
     ext = mark[1]
     marked = []
     for sub in subs:
@@ -125,11 +137,18 @@ def mark_extensions(mark: list, subs: list):
     return marked
 
 
-def mark_all(mark: list,  subs: list):
+def mark_all(mark: list,  subs: list) -> list:
+    '''
+    returns all files given
+    '''
     return subs
 
 
-def mark_files(mark: list, subs: list):
+def mark_files(mark: list, subs: list) -> list:
+    '''
+    takes user input and determines which function to call, then calls
+    and returns the marked paths
+    '''
     mark_options = {
         'A': mark_all,
         'N': mark_file_name,
@@ -159,7 +178,10 @@ def get_action() -> list:
     return action
 
 
-def take_action(action: str, marked: list):
+def take_action(action: str, marked: list) -> None:
+    '''
+    takes user input and determines which function to call, then calls it
+    '''
     actions = {
         'F': first_line,
         'D': dupe,
@@ -169,7 +191,10 @@ def take_action(action: str, marked: list):
     action(marked)
 
 
-def first_line(marked: list):
+def first_line(marked: list) -> None:
+    '''
+    prints the first line of each Path passed in in lexographic order
+    '''
     for file in sorted(marked, key=lexo_sort):
         try:
             txt = file.read_text()
@@ -182,27 +207,49 @@ def first_line(marked: list):
             print("NOT TEXT")
 
 
-def dupe(marked: list):
+def dupe(marked: list) -> None:
+    '''
+    makes a .dup file copy of each Path in the marked list
+    '''
     for file in marked:
-        name = file.stem
-        suffix = file.suffix
         shutil.copy(str(file), str(file) + '.dup')
 
 
-def touch(marked: list):
+def touch(marked: list) -> None:
+    '''
+    touches each file in the list, updating its last modified time
+    '''
     for file in marked:
         file.touch()
 
 
-def print_dir(dir: list):
+def print_dir(dir: list) -> None:
+    '''
+    generic print for a list of Paths, print's in lexographic order as defined
+    by the lexo_sort function
+    '''
     for file in sorted(dir, key=lexo_sort):
         print(file.__str__())
 
 
 def lexo_sort(x):
+    '''
+    key to sorted() function to be able to sort Paths in lexographic order
+    '''
     splits = x.__str__().split('\\')[4:]
     return len(splits), splits
 
+
+def testing():
+    print("Enter a path to test")
+    dir = get_file_path()
+    print(type(dir))
+    assert type(dir) == list
+    assert len(dir) == 2
+    dir = get_directory(dir)
+    assert type(dir) == list
+    mark = mark_all('A', dir)
+    assert dir == mark
 
 def main():
     dir = get_file_path()
@@ -216,4 +263,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    testing()
