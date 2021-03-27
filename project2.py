@@ -243,13 +243,16 @@ def lexo_sort(x):
 def testing():
     print("Enter a path to test")
     dir = get_file_path()
-    print(type(dir))
     assert type(dir) == list
+    print('Formatted as a list')
     assert len(dir) == 2
+    print('Of length 2')
     dir = get_directory(dir)
     assert type(dir) == list
+    print('files returned as list')
     mark = mark_all('A', dir)
     assert dir == mark
+    print('all marked files same as directory')
 
 def main():
     dir = get_file_path()
