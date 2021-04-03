@@ -7,6 +7,8 @@ class CreditCard(unittest.TestCase):
         self.balance = newBalance
         self.limit = 1200.0
         self.interest = newInterest
+        self._testMethodName = "test_limit"
+        self._cleanups = ''
 
     def adjust_limit(self, newLimit) -> None:
         self.limit = newLimit
@@ -34,7 +36,7 @@ class CreditCard(unittest.TestCase):
 
     def compute_bill(self, interest: bool) -> float:
         if interest:
-            return round(self.interest * self.balance, 2)
+            return round((1 + self.interest) * self.balance, 2)
         else:
             return round(self.balance, 2)
 
