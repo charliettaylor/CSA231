@@ -1,17 +1,20 @@
-# Charlie Taylor Project 4
+# Charlie Taylor Project 3
 
 import CreditCard as cc
 import unittest as ut
 
 
 class TestCreditCard(ut.TestCase):
-    def initialize(self) -> None:
+    def __init__(self, thing) -> None:
         self.cc1 = cc.CreditCard()
-        self.cc2 = cc.CreditCard(10.0, 5.0, 0.0)
+        self.cc2 = cc.CreditCard(10.0, 5.0, 0.2)
+        self._testMethodName = "test_init"
+        self._cleanups = ''
+        self._testMethodDoc = ''
 
     def test_init(self):
-        self.assertRaises(cc.CreditCard(10.0, -5.0, 0.1))
-        self.assertRaises(cc.CreditCard(10.0, 5.0, 0.0))
+        self.assertRaises(ValueError, cc.CreditCard, 10.0, -5.0, 0.1)
+        self.assertRaises(ValueError, cc.CreditCard, 10.0, 5.0, 0.0)
 
     def test_limit(self) -> None:
         self.cc1.adjust_limit(1000.0)
@@ -38,3 +41,6 @@ class TestCreditCard(ut.TestCase):
 
         self.assertRaises(ValueError, self.cc2.add_charge, -10)
         self.assertRaises(ValueError, self.cc2.make_payment, -10)
+
+if __name__ == "__main__":
+    ut.main()
