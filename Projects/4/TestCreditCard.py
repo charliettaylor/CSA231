@@ -1,8 +1,10 @@
+# Charlie Taylor Project 4
+
 import CreditCard as cc
-import unittest as  ut
+import unittest as ut
+
 
 class TestCreditCard(ut.TestCase):
-
     def initialize(self) -> None:
         self.cc1 = cc.CreditCard()
         self.cc2 = cc.CreditCard(10.0, 5.0, 0.0)
