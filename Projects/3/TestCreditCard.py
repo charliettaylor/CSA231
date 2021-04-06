@@ -5,12 +5,9 @@ import unittest as ut
 
 
 class TestCreditCard(ut.TestCase):
-    def __init__(self, thing) -> None:
+    def setUp(self) -> None:
         self.cc1 = cc.CreditCard()
         self.cc2 = cc.CreditCard(10.0, 5.0, 0.2)
-        self._testMethodName = "test_init"
-        self._cleanups = ''
-        self._testMethodDoc = ''
 
     def test_init(self):
         self.assertRaises(ValueError, cc.CreditCard, 10.0, -5.0, 0.1)
@@ -24,7 +21,7 @@ class TestCreditCard(ut.TestCase):
         self.assertRaises(ValueError, self.cc2.adjust_limit, 0)
 
     def test_interest(self) -> None:
-        self.cc1.adjust_interst(0.1)
+        self.cc1.adjust_interest(0.1)
         self.assertTrue(type(self.cc1.interest), float)
         self.assertTrue(self.cc1.limit, 0.1)
 
@@ -41,6 +38,13 @@ class TestCreditCard(ut.TestCase):
 
         self.assertRaises(ValueError, self.cc2.add_charge, -10)
         self.assertRaises(ValueError, self.cc2.make_payment, -10)
+
+    def runTest(self):
+        self.test_init()
+        self.test_balance_modifiers()
+        self.test_interest()
+        self.test_limit()
+
 
 if __name__ == "__main__":
     ut.main()
