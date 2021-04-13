@@ -3,6 +3,10 @@
 from turtle import *
 import random as rand
 
+SCALE = "Enter the size of the spiral (recommend 1-10): "
+LOW = "Enter low bound of shake (rec. negative or 0): "
+HIGH = "Enter high bound of shake (rec. positive or 0): "
+
 
 def draw_c(t) -> None:
     '''
@@ -71,12 +75,15 @@ def spiral(t, degrees, n, scale, low=0, high=0) -> None:
 
 def main():
     print("Welcome to the spiral maker by Charlie Taylor")
-    try:
-        scale = float(input("Enter the size of the spiral (recommend 1-10): "))
-        low = int(input("Enter low bound of shake (rec. negative or 0): "))
-        high = int(input("Enter high bound of shake (rec. positive or 0): "))
-    except ValueError:
-        print("Enter a positive non zero integer")
+    done = False
+    while not done:
+        try:
+            scale = float(input(SCALE))
+            low = int(input(LOW))
+            high = int(input(HIGH))
+            done = True
+        except ValueError:
+            print("Enter a positive non zero integer")
 
     wn = Screen()
     wn.bgcolor("black")
