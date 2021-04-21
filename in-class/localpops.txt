@@ -1,0 +1,3 @@
+Costa Mesa, 47, 35, 25
+Irvine, 55, 42, 20
+Los Angeles, 3500, 3050, 500
