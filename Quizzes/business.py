@@ -1,3 +1,5 @@
+# Quiz 8 Charlie Taylor
+
 SALES_FILE = 'sales.txt'
 
 
@@ -39,6 +41,7 @@ class CoffeeShop:
         self.total_sold += self.drinks[drink]
     
     def print_menu(self):
+        print(self.name)
         print('....................')
         for drink in self.drinks:
             print(drink + "....$" + str(round(self.drinks[drink], 2)))
